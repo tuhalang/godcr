@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	main "github.com/raedahgroup/godcr-gio"
+	"github.com/raedahgroup/godcr-gio/main"
 )
 
 var _ = Describe("Version", func() {
