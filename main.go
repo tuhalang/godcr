@@ -10,7 +10,7 @@ import (
 
 func main() {
 	gofont.Register()
-	win, err := createWindow(landingPage)
+	win, err := createWindow(transactionsPage)
 	if err != nil {
 		fmt.Printf("Could not initialize window: %s\ns", err)
 		return

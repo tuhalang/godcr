@@ -16,6 +16,6 @@ import (
 // Draw adds the implementation's widgets to the stored
 // layout context
 type Page interface {
-	Init(*material.Theme, *layout.Context)
+	Init(theme *material.Theme, gtk *layout.Context)
 	Draw()
 }

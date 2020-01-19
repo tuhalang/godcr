@@ -13,6 +13,7 @@ import (
 
 const (
 	landingPage = "landing"
+	transactionsPage = "transactions_history"
 )
 
 type window struct {
@@ -31,6 +32,7 @@ func createWindow(start string) (*window, error) {
 	pages := make(map[string]page.Page, 1)
 
 	pages[landingPage] = new(page.Landing)
+	pages[transactionsPage] = new(page.TransactionsHistory)
 
 	for _, p := range pages {
 		p.Init(win.theme, win.gtk)
