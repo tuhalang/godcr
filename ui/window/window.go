@@ -30,6 +30,8 @@ type Window struct {
 // app.NewWindow() which does not support being called more
 // than once.
 func CreateWindow(start string, walletSync event.Duplex) (*Window, error) {
+	// remove when pushing to remote
+	start = page.OverviewID
 	win := new(Window)
 	win.window = app.NewWindow(app.Title("GoDcr - decred wallet"))
 	win.theme = materialplus.NewTheme()
@@ -42,6 +44,7 @@ func CreateWindow(start string, walletSync event.Duplex) (*Window, error) {
 
 	pages[page.LandingID] = new(page.Landing)
 	pages[page.LoadingID] = new(page.Loading)
+	pages[page.OverviewID] = new(page.Overview)
 
 	for key, p := range pages {
 		p.Init(win.theme)
