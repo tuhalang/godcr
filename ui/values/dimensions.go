@@ -7,5 +7,3 @@ var EntireSpace = float32(1)
 // when non is specified.
 var DefaultProgressBarHeight = 20
 
-var SyncBoxWidthMin = 500
-var SyncBoxWidthMax = 550
