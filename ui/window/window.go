@@ -106,14 +106,14 @@ func (win *Window) Loop() {
 				}
 				return
 			case system.FrameEvent:
-				fmt.Println("Frame")
+				// fmt.Println("Frame")
 				win.gtx.Reset(evt.Config, evt.Size)
 				win.uiEvents <- win.pages[win.current].Draw(win.gtx, win.pageStates[win.current])
 				evt.Frame(win.gtx.Ops)
 			case nil:
 				// Ignore
 			default:
-				fmt.Printf("Unhandled window event %+v\n", e)
+				// fmt.Printf("Unhandled window event %+v\n", e)
 			}
 		}
 	}
