@@ -11,4 +11,6 @@ var (
 
 	// walletSyncBoxGray is the background color of wallet sync boxes.
 	DefaultCardGray = color.RGBA{243, 245, 246, 255}
+
+	Transparent = color.RGBA{0, 0, 0, 0}
 )
