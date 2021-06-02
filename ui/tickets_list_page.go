@@ -194,7 +194,8 @@ func (pg *ticketPageList) ticketListLayout(gtx layout.Context, c pageCommon, tic
 						}),
 						layout.Stacked(func(gtx C) D {
 							gtx.Constraints.Max.X = progressBarWidth - 4
-							p := c.theme.ProgressBar(20)
+							blockHeight := tickets[index].Info.BlockHeight
+							p := c.theme.ProgressBar(c.getPercentConfirmation(blockHeight))
 							p.Height, p.Radius = values.MarginPadding4, values.MarginPadding2
 							p.Color = st.color
 							return p.Layout(gtx)

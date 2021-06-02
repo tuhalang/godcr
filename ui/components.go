@@ -856,10 +856,32 @@ func ticketCard(gtx layout.Context, c pageCommon, t *wallet.Ticket) layout.Dimen
 									return layout.Inset{
 										Top:    values.MarginPadding4,
 										Bottom: values.MarginPadding4,
-										Right:  values.MarginPadding8,
-										Left:   values.MarginPadding8,
+										Right:  values.MarginPadding4,
+										Left:   values.MarginPadding4,
 									}.Layout(gtx, func(gtx C) D {
-										return c.theme.Label(values.TextSize14, "10h 47m").Layout(gtx)
+										blockHeight := t.Info.BlockHeight
+										return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+											layout.Rigid(func(gtx C) D {
+												return layout.Inset{Right: values.MarginPadding8, Top: values.MarginPadding5}.Layout(gtx,
+													func(gtx C) D {
+														return layout.Center.Layout(gtx, func(gtx C) D {
+															image := c.icons.timerIcon
+															image.Scale = 1.0
+															return image.Layout(gtx)
+														})
+													})
+											}),
+											layout.Rigid(func(gtx C) D {
+												return layout.Inset{
+													Left:  values.MarginPadding0,
+													Right: values.MarginPadding1,
+												}.Layout(gtx, func(gtx C) D {
+													return layout.Center.Layout(gtx, func(gtx C) D {
+														return c.theme.Body1(c.getTimeToLive(blockHeight)).Layout(gtx)
+													})
+												})
+											}),
+										)
 									})
 								})
 							})
@@ -882,7 +904,8 @@ func ticketCard(gtx layout.Context, c pageCommon, t *wallet.Ticket) layout.Dimen
 							return layout.Center.Layout(gtx, func(gtx C) D {
 								return layout.Inset{Top: values.MarginPadding20}.Layout(gtx, func(gtx C) D {
 									gtx.Constraints.Max.X = itemWidth
-									p := c.theme.ProgressBar(20)
+									blockHeight := t.Info.BlockHeight
+									p := c.theme.ProgressBar(c.getPercentConfirmation(blockHeight))
 									p.Height, p.Radius = values.MarginPadding4, values.MarginPadding1
 									p.Color = st.color
 									return p.Layout(gtx)
@@ -911,13 +934,13 @@ func ticketCard(gtx layout.Context, c pageCommon, t *wallet.Ticket) layout.Dimen
 								})
 							}),
 							layout.Rigid(func(gtx C) D {
-								return layout.Flex{Alignment: layout.Middle}.Layout(gtx,
-									layout.Rigid(func(gtx C) D {
+								return layout.Flex{Alignment: layout.Middle, Spacing: layout.SpaceBetween, WeightSum: 10}.Layout(gtx,
+									layout.Flexed(4, func(gtx C) D {
 										txt := c.theme.Label(values.MarginPadding14, t.Info.Status)
 										txt.Color = st.color
 										return txt.Layout(gtx)
 									}),
-									layout.Rigid(func(gtx C) D {
+									layout.Flexed(1, func(gtx C) D {
 										return layout.Inset{
 											Left:  values.MarginPadding4,
 											Right: values.MarginPadding4,
@@ -927,7 +950,7 @@ func ticketCard(gtx layout.Context, c pageCommon, t *wallet.Ticket) layout.Dimen
 											return c.icons.imageBrightness1.Layout(gtx, values.MarginPadding5)
 										})
 									}),
-									layout.Rigid(func(gtx C) D {
+									layout.Flexed(5, func(gtx C) D {
 										return c.theme.Label(values.MarginPadding14, t.WalletName).Layout(gtx)
 									}),
 								)
