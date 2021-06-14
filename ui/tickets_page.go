@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"strconv"
 	"strings"
+	"time"
 
 	"gioui.org/unit"
 
@@ -900,31 +901,40 @@ func (pg *ticketPage) handle() {
 }
 
 const (
-	TotalConfirmBlock = 16
-	TimeToCreateBlock = 2
+	TotalConfirmBlock = 256
+	TimeToCreateBlock = 5
 )
 
 func (c *pageCommon) getPercentConfirmation(blockHeight int32) int {
 	currBlockHeight := c.info.BestBlockHeight
 	confirmations := currBlockHeight - blockHeight
-	percent := confirmations / TotalConfirmBlock
+	percent := float32(confirmations) / TotalConfirmBlock * 100
 	return int(percent)
 }
 
-func (c *pageCommon) getTimeToLive(blockHeight int32) string {
+func (c *pageCommon) getTimeBehind(datetime string) (int, string) {
+	layout := "Jan 2, 2006 03:04:05 PM"
+	t, err := time.Parse(layout, datetime)
+	if err != nil {
+		return 0, "h"
+	}
+	now := time.Now()
+	hours := int(now.Sub(t).Hours())
+	if hours >= 24 {
+		return hours / 24, "d"
+	}
+
+	return hours, "h"
+}
+
+func (c *pageCommon) getTimeToDone(blockHeight int32) int32 {
 	currBlockHeight := c.info.BestBlockHeight
 	confirmations := currBlockHeight - blockHeight
 	minutes := (TotalConfirmBlock - confirmations) * TimeToCreateBlock
-	hours := 0
 	if minutes > 0 {
-		hours = int(minutes / 60)
-		minutes = minutes % 60
-	} else {
-		hours = 0
-		minutes = 0
+		return minutes
 	}
-	return fmt.Sprintf("%d:%d", hours, minutes)
-
+	return 0
 }
 
 func (pg *ticketPage) onClose() {}

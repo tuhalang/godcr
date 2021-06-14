@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"image/color"
 	"sort"
 	"time"
@@ -195,7 +196,12 @@ func (pg *ticketPageList) ticketListLayout(gtx layout.Context, c pageCommon, tic
 						layout.Stacked(func(gtx C) D {
 							gtx.Constraints.Max.X = progressBarWidth - 4
 							blockHeight := tickets[index].Info.BlockHeight
-							p := c.theme.ProgressBar(c.getPercentConfirmation(blockHeight))
+							percent := c.getPercentConfirmation(blockHeight)
+
+							if percent >= 100 {
+								return layout.Dimensions{}
+							}
+							p := c.theme.ProgressBar(percent)
 							p.Height, p.Radius = values.MarginPadding4, values.MarginPadding2
 							p.Color = st.color
 							return p.Layout(gtx)
@@ -247,7 +253,12 @@ func (pg *ticketPageList) ticketListLayout(gtx layout.Context, c pageCommon, tic
 										)
 									}
 									r := func(gtx C) layout.Dimensions {
-										txt := c.theme.Label(values.TextSize14, tickets[index].DaysBehind)
+										timeBehind, unit := c.getTimeBehind(tickets[index].DateTime)
+										if timeBehind == 0 && unit == "h" {
+											return layout.Dimensions{}
+										}
+
+										txt := c.theme.Label(values.TextSize14, fmt.Sprintf("%d%s", timeBehind, unit))
 										txt.Color = c.theme.Color.Gray2
 										return txt.Layout(gtx)
 									}

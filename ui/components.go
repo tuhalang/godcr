@@ -853,13 +853,23 @@ func ticketCard(gtx layout.Context, c pageCommon, t *wallet.Ticket) layout.Dimen
 								wTimeLabel := c.theme.Card()
 								wTimeLabel.Radius = decredmaterial.CornerRadius{NE: 0, NW: 8, SE: 0, SW: 8}
 								return wTimeLabel.Layout(gtx, func(gtx C) D {
+									blockHeight := t.Info.BlockHeight
+									totalTime := c.getTimeToDone(blockHeight)
+
+									if totalTime == 0 {
+										return layout.Inset{}.Layout(gtx, func(gtx C) D {
+											return layout.Dimensions{}
+										})
+									}
+
+									hours := totalTime / 60
+									minute := totalTime % 60
 									return layout.Inset{
 										Top:    values.MarginPadding4,
 										Bottom: values.MarginPadding4,
 										Right:  values.MarginPadding4,
 										Left:   values.MarginPadding4,
 									}.Layout(gtx, func(gtx C) D {
-										blockHeight := t.Info.BlockHeight
 										return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 											layout.Rigid(func(gtx C) D {
 												return layout.Inset{Right: values.MarginPadding8, Top: values.MarginPadding5}.Layout(gtx,
@@ -877,7 +887,7 @@ func ticketCard(gtx layout.Context, c pageCommon, t *wallet.Ticket) layout.Dimen
 													Right: values.MarginPadding1,
 												}.Layout(gtx, func(gtx C) D {
 													return layout.Center.Layout(gtx, func(gtx C) D {
-														return c.theme.Body1(c.getTimeToLive(blockHeight)).Layout(gtx)
+														return c.theme.Body1(fmt.Sprintf("%d:%d", hours, minute)).Layout(gtx)
 													})
 												})
 											}),
@@ -905,7 +915,13 @@ func ticketCard(gtx layout.Context, c pageCommon, t *wallet.Ticket) layout.Dimen
 								return layout.Inset{Top: values.MarginPadding20}.Layout(gtx, func(gtx C) D {
 									gtx.Constraints.Max.X = itemWidth
 									blockHeight := t.Info.BlockHeight
-									p := c.theme.ProgressBar(c.getPercentConfirmation(blockHeight))
+									percent := c.getPercentConfirmation(blockHeight)
+
+									if percent >= 100 {
+										return layout.Dimensions{}
+									}
+
+									p := c.theme.ProgressBar(percent)
 									p.Height, p.Radius = values.MarginPadding4, values.MarginPadding1
 									p.Color = st.color
 									return p.Layout(gtx)
@@ -934,13 +950,14 @@ func ticketCard(gtx layout.Context, c pageCommon, t *wallet.Ticket) layout.Dimen
 								})
 							}),
 							layout.Rigid(func(gtx C) D {
-								return layout.Flex{Alignment: layout.Middle, Spacing: layout.SpaceBetween, WeightSum: 10}.Layout(gtx,
-									layout.Flexed(4, func(gtx C) D {
+								return layout.Flex{Alignment: layout.Middle, Spacing: layout.SpaceBetween}.Layout(gtx,
+									layout.Rigid(func(gtx C) D {
 										txt := c.theme.Label(values.MarginPadding14, t.Info.Status)
+										txt.TextSize = unit.Px(12)
 										txt.Color = st.color
 										return txt.Layout(gtx)
 									}),
-									layout.Flexed(1, func(gtx C) D {
+									layout.Rigid(func(gtx C) D {
 										return layout.Inset{
 											Left:  values.MarginPadding4,
 											Right: values.MarginPadding4,
@@ -950,8 +967,10 @@ func ticketCard(gtx layout.Context, c pageCommon, t *wallet.Ticket) layout.Dimen
 											return c.icons.imageBrightness1.Layout(gtx, values.MarginPadding5)
 										})
 									}),
-									layout.Flexed(5, func(gtx C) D {
-										return c.theme.Label(values.MarginPadding14, t.WalletName).Layout(gtx)
+									layout.Rigid(func(gtx C) D {
+										txt := c.theme.Label(values.MarginPadding14, t.WalletName)
+										txt.TextSize = unit.Px(14)
+										return txt.Layout(gtx)
 									}),
 								)
 							}),
@@ -977,7 +996,12 @@ func ticketCard(gtx layout.Context, c pageCommon, t *wallet.Ticket) layout.Dimen
 											})
 										}),
 										layout.Rigid(func(gtx C) D {
-											txt.Text = t.DaysBehind
+											timeBehind, unit := c.getTimeBehind(t.DateTime)
+											if timeBehind == 0 && unit == "h" {
+												return layout.Dimensions{}
+											}
+
+											txt.Text = fmt.Sprintf("%d%s", timeBehind, unit)
 											return txt.Layout(gtx)
 										}),
 									)
